@@ -1,19 +1,10 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils import timezone
 from users.models import Company, Customer
 
-
 class Service(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    name = models.CharField(max_length=40)
-    description = models.TextField()
-    price_hour = models.DecimalField(decimal_places=2, max_digits=100)
-    rating = models.IntegerField(validators=[MinValueValidator(
-        0), MaxValueValidator(5)], default=0)
-    choices = (
+    FIELD_CHOICES = [
         ('Air Conditioner', 'Air Conditioner'),
         ('Carpentry', 'Carpentry'),
         ('Electricity', 'Electricity'),
@@ -25,10 +16,36 @@ class Service(models.Model):
         ('Painting', 'Painting'),
         ('Plumbing', 'Plumbing'),
         ('Water Heaters', 'Water Heaters'),
-    )
-    field = models.CharField(max_length=30, blank=False,
-                             null=False, choices=choices)
-    date = models.DateTimeField(auto_now=True, null=False)
+    ]
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='services')
+    name = models.CharField(max_length=40)
+    description = models.TextField()
+    price_hour = models.DecimalField(decimal_places=2, max_digits=10)
+    rating = models.IntegerField(default=0)
+    field = models.CharField(max_length=30, choices=FIELD_CHOICES)
+    date = models.DateTimeField(default=timezone.now)  # Correct field name
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # Ensure the service field matches the company's field of work
+        if self.company.field != 'All in One' and self.company.field != self.field:
+            raise ValueError(f"This company can only provide {self.company.field} services.")
+        super().save(*args, **kwargs)
+
+
+class ServiceRequest(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='requests')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='requests')
+    address = models.CharField(max_length=200)
+    service_time = models.IntegerField(help_text="Time in hours")
+    date_requested = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def total_cost(self):
+        return self.service.price_hour * self.service_time
+
+    def __str__(self):
+        return f"{self.customer.user.username} - {self.service.name}"
