@@ -19,7 +19,62 @@ def validate_email(value):
 
 # Customer SignUp Form
 class CustomerSignUpForm(UserCreationForm):
-    pass
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Enter your email address',
+            'class': 'form-control'  # Optional: Add a CSS class
+        }),
+        label="Email",
+        help_text="Enter a valid email address."
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your username',
+            'class': 'form-control'  # Optional: Add a CSS class
+        }),
+        label="Username",
+        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter your password',
+            'class': 'form-control'  # Optional: Add a CSS class
+        }),
+        label="Password",
+        help_text="Your password must contain at least 8 characters and cannot be entirely numeric."
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm your password',
+            'class': 'form-control'  # Optional: Add a CSS class
+        }),
+        label="Password Confirmation",
+        help_text="Enter the same password as before, for verification."
+    )
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'  # Optional: Add a CSS class
+        }),
+        label="Date of Birth",
+        help_text="Enter your date of birth."
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'email', 'password1', 'password2', 'date_of_birth')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_customer = True  # Set the user as a customer
+        if commit:
+            user.save()
+            # Create a Customer profile for the user
+            Customer.objects.create(
+                user=user,
+                date_of_birth=self.cleaned_data['date_of_birth']
+            )
+        return user
 
 # Company SignUp Form
 class CompanySignUpForm(UserCreationForm):

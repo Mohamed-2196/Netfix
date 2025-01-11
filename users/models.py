@@ -15,6 +15,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+
 class Customer(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
@@ -22,6 +23,7 @@ class Customer(models.Model):
 
     def __str__(self):
         return str(self.user.id) + ' - ' + self.user.username
+
 
 class Company(models.Model):
     FIELD_CHOICES = [
