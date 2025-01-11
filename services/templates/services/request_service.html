@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+
 {% block title %}
     Request Service
 {% endblock %}
@@ -6,6 +7,19 @@
 {% block content %}
     <p class="title">Service Request Details</p>
     <form method="POST">
+        {% csrf_token %}  <!-- Add this for security -->
+        
+        <!-- Render the form fields -->
+        <div>
+            <label for="{{ form.address.id_for_label }}">Address:</label>
+            {{ form.address }}
+        </div>
+        
+        <div>
+            <label for="{{ form.service_time.id_for_label }}">Service Time (in hours):</label>
+            {{ form.service_time }}
+        </div>
+        
         <button type="submit">Request</button>
     </form>
 {% endblock %}

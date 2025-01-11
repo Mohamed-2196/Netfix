@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from services.models import ServiceRequest
 
-from users.models import User, Company
+from users.models import User, Company,Customer
 from services.models import Service
 
 
@@ -8,8 +9,13 @@ def home(request):
     return render(request, 'users/home.html', {'user': request.user})
 
 
-def customer_profile(request):
-    pass
+def customer_profile(request, username):
+    customer = get_object_or_404(Customer, user__username=username)
+    service_history = ServiceRequest.objects.filter(customer=customer).order_by("-date_requested")
+    return render(request, 'users/profile.html', {
+        'customer': customer,
+        'sh': service_history,
+    })
 
 
 def company_profile(request, name):

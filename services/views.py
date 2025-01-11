@@ -61,6 +61,7 @@ def service_field(request, field):
     return render(request, 'services/field.html', {'services': services, 'field': field})
 
 # Request a service (only for customers)
+
 @login_required
 def request_service(request, id):
     service = get_object_or_404(Service, id=id)
@@ -70,13 +71,18 @@ def request_service(request, id):
     if request.method == 'POST':
         form = RequestServiceForm(request.POST)
         if form.is_valid():
-            request_obj = form.save(commit=False)
-            request_obj.customer = request.user.customer
-            request_obj.service = service
-            request_obj.save()
+            # Create a new Request object manually
+            request_obj = ServiceRequest(
+                customer=request.user.customer,
+                service=service,
+                address=form.cleaned_data['address'],
+                service_time=form.cleaned_data['service_time']
+            )
+            request_obj.save()  # Save the object to the database
             return redirect('customer_profile', username=request.user.username)
     else:
         form = RequestServiceForm()
+
     return render(request, 'services/request_service.html', {'form': form, 'service': service})
 
 # Display company profile
