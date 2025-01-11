@@ -18,5 +18,15 @@
             </ul>
         </li>
         <li><a href="/company/{{ request.user.username }}">Profile</a></li>
+        <li class="last_navbar">
+            {% if user.is_authenticated %}
+                <!-- Show Logout if the user is logged in -->
+                <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+            {% else %}
+                <!-- Show Register and Login if the user is not logged in -->
+                <a href="{% url 'register' %}" class="btn-register">Register</a>
+                <a href="{% url 'login' %}" class="btn-login">Login</a>
+            {% endif %}
+        </li>
     </ul>
 </nav>

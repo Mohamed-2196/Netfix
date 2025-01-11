@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+  Login
+{% endblock %}
+
+{% block content %}
+  <div>
+    <h2>Login</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div>
+        {{ form.email }}  <!-- Email input field -->
+        {% if form.email.errors %}
+          <div class="error_message">{{ form.email.errors }}</div>
+        {% endif %}
+      </div>
+      <div>
+        {{ form.password }}  <!-- Password input field -->
+        {% if form.password.errors %}
+          <div class="error_message">{{ form.password.errors }}</div>
+        {% endif %}
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+  </div>
+{% endblock %}

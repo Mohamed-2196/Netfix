@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.views.generic import CreateView, TemplateView
 
 from .forms import CustomerSignUpForm, CompanySignUpForm, UserLoginForm
@@ -41,4 +41,34 @@ class CompanySignUpView(CreateView):
 
 
 def LoginUserView(request):
-    pass
+    print("LoginUserView called")  # Debug statement
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            print("Form is valid")  # Debug statement
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            print(f"Email: {email}, Password: {password}")  # Debug statement
+            try:
+                user = User.objects.get(email=email)
+                if user.check_password(password):
+                    print("User authenticated successfully")  # Debug statement
+                    login(request, user)
+                    return redirect('/')
+                else:
+                    print("Authentication failed: Incorrect password")  # Debug statement
+                    form.add_error(None, "Invalid email or password.")  # Add a non-field error
+            except User.DoesNotExist:
+                print("Authentication failed: User does not exist")  # Debug statement
+                form.add_error(None, "Invalid email or password.")  # Add a non-field error
+        else:
+            print("Form is invalid")  # Debug statement
+            print(form.errors)  # Print form errors
+    else:
+        form = UserLoginForm()
+
+    print("Rendering login template")  # Debug statement
+    return render(request, 'users/login.html', {'form': form})
+def logout_view(request):
+    logout(request)  # Log the user out
+    return redirect('home')  # Redirect to the home page after logout

@@ -97,6 +97,7 @@ button:hover {
 
 /* ======================================== Navbar ============================================== */
 
+/* Navbar Styles */
 .navbar {
   position: sticky;
   top: 15px;
@@ -118,21 +119,25 @@ button:hover {
   padding: 0 30px;
   list-style-type: none;
 }
+
 .navbar ul li:not(:last-child) {
   margin-right: 40px;
 }
+
 .navbar ul li {
   border: 2px solid transparent;
   border-radius: 5px;
   padding: 10px;
   transition: background 0.2s;
 }
+
 .navbar ul li a {
   color: #ec2f00;
   text-decoration: none;
   text-transform: uppercase;
   transition: color 0.2s;
 }
+
 .navbar ul li ul {
   visibility: hidden;
   opacity: 0;
@@ -147,6 +152,7 @@ button:hover {
   border-radius: 5px;
   transition: opacity 0.2s, visibility 0.2s;
 }
+
 .navbar ul li ul li {
   margin: -2px 0 0 -2px;
   width: calc(100% - 20px);
@@ -159,22 +165,65 @@ button:hover {
   border-right: 2px solid #e02a21;
   border-bottom: 2px solid #e02a21;
 }
+
 .navbar ul li:hover a {
   color: #f9f8fd;
 }
+
 .navbar ul li:hover ul {
   visibility: visible;
   opacity: 1;
   box-shadow: 0px 3px 5px 2px #ebecf1;
 }
+
 .navbar ul li:hover ul li a {
   color: #f9f8fd;
 }
 
+/* Last Navbar Item (Register/Login) */
+/* Button Styles */
+/* Button Styles */
+/* Button Styles */
+.btn-register, .btn-login {
+  border: 2px solid transparent;  /* Match border style */
+  border-radius: 5px;            /* Match border radius */
+  padding: 10px 15px;            /* Consistent padding */
+  text-transform: uppercase;      /* Consistent text style */
+  transition: background 0.2s, color 0.2s, border 0.2s; /* Smooth transitions */
+  color: #ec2f00;                 /* Match text color */
+}
+
+/* Hover Effects for Each Button Separately */
+.btn-register:hover {
+  background-color: #8a5957;      /* Change background on hover for Register */
+  border: 2px solid #8a5957;      /* Add border on hover for Register */
+  color: #f9f8fd;                  /* Change text color on hover for Register */
+}
+
+.btn-login:hover {
+  background-color: #8a5957;      /* Change background on hover for Login */
+  border: 2px solid #f05749;      /* Add border on hover for Login */
+  color: #f9f8fd;                  /* Change text color on hover for Login */
+}
+
+/* Last Navbar Item (Register/Login) */
 .last_navbar {
   right: 0;
   position: absolute;
   margin-right: 20px;
+}
+
+.last_navbar a {
+  margin-left: 10px;
+}
+/* Animation */
+@keyframes slide-in {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* ============================================================================================== */
