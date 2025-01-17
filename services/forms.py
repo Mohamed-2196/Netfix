@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Service, ServiceRequest
 from users.models import Company
+from .models import Rating
 
 class CreateNewService(forms.Form):
     name = forms.CharField(max_length=40)
@@ -33,7 +34,6 @@ class CreateNewService(forms.Form):
 
         return cleaned_data
 
-
 class RequestServiceForm(forms.Form):
     address = forms.CharField(
         max_length=200,
@@ -48,3 +48,11 @@ class RequestServiceForm(forms.Form):
         super(RequestServiceForm, self).__init__(*args, **kwargs)
         # Add placeholders to form fields
         self.fields['address'].widget.attrs['autocomplete'] = 'off'
+
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rating_value', 'review']
+        widgets = {
+            'rating_value': forms.RadioSelect(choices=[(i, f"{i} Star") for i in range(1, 6)]),
+        }
