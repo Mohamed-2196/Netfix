@@ -7,7 +7,7 @@ from users.models import Company, Customer
 
 # Rating model
 class Rating(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_ratings') 
+    service = models.ForeignKey('Service', on_delete=models.CASCADE, related_name='service_ratings') 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='customer_ratings') 
     rating_value = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
@@ -63,7 +63,7 @@ class Service(models.Model):
 #method to get average rating
     @property
     def average_rating(self):
-        ratings = self.ratings.all()
+        ratings = self.service_ratings.all()
         total_ratings = ratings.count()
         if total_ratings == 0:
             return 0

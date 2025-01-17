@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from users.models import Company, Customer, User
-from .models import Service, ServiceRequest
-from .forms import CreateNewService, RequestServiceForm
+from .models import Service, ServiceRequest, Rating
+from .forms import CreateNewService, RequestServiceForm, RatingForm
 
 # List all services
 def service_list(request):
@@ -13,16 +13,62 @@ def service_list(request):
 # Display a single service
 def index(request, id):
     service = get_object_or_404(Service, id=id)
-    return render(request, 'services/single_service.html', {'service': service})
+    ratings = Rating.objects.filter(service=service).order_by("-date_rated")
+    has_requested = (
+        request.user.is_authenticated
+        and hasattr(request.user, 'customer')
+        and ServiceRequest.objects.filter(service=service, customer=request.user.customer).exists()
+    )
+    form = RatingForm() if has_requested else None
+    rating_range = range(1, 6)
+    return render(request, 'services/single_service.html', {
+        'service': service,
+        'ratings': ratings,
+        'form': form,
+        'has_requested': has_requested,
+        'rating_range': rating_range, # pass the rating range to the template  
+    })
+
+@login_required
+def submit_rating(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    if not hasattr(request.user, 'customer'):
+        return redirect('home')  # Only customers can rate services
+
+    # Check if the customer has requested this service
+    if not ServiceRequest.objects.filter(service=service, customer=request.user.customer).exists():
+         return redirect('index', id=service_id)
+    
+    #cheak if the customer has already rated the service
+    existing_rating = Rating.objects.filter(service=service, customer=request.user.customer).first()
+
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            if existing_rating:
+                # If the rating already exists, update it
+                existing_rating.rating_value = form.cleaned_data['rating_value']
+                existing_rating.review = form.cleaned_data['review']
+                existing_rating.save()
+            else:
+                # Otherwise, create a new rating
+                rating = form.save(commit=False)
+                rating.service = service
+                rating.customer = request.user.customer
+                rating.save()
+
+            # Update the service's average rating
+            service.update_average_rating()
+
+            return redirect('index', id=service_id)  # Redirect back to the service detail page
+
+    else:
+        form = RatingForm(instance=existing_rating)  # Pre-fill the form with the existing rating if it exists
+
+    return render(request, 'services/rating_form.html', {'form': form, 'service': service})
 
 # Create a new service (only for companies)
-# views.py
-# services/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import CreateNewService
-from .models import Service
-
 @login_required
 def create(request):
     if not request.user.is_company:

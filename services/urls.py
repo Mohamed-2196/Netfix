@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:id>', v.index, name='index'),
     path('<int:id>/request_service/', v.request_service, name='request_service'),
     path('<slug:field>/', v.service_field, name='services_field'),
+    path('<int:service_id>/rate/', v.submit_rating, name='submit_rating'), #submitting a url
 ]

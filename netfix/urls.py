@@ -29,7 +29,7 @@ urlpatterns = [
     path('customer/<slug:username>', v.customer_profile, name='customer_profile'),
     path('company/<slug:name>', v.company_profile, name='company_profile'),
     path('login/', include('users.urls')),
-    path('logout/', logout_view, name='logout'),
+    path('logout/', logout_view, name='logout'), 
 
 
 ]

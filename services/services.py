@@ -2,7 +2,6 @@ from django import forms
 
 from users.models import Company
 
-
 class CreateNewService(forms.Form):
     name = forms.CharField(max_length=40)
     description = forms.CharField(widget=forms.Textarea, label='Description')

@@ -4,12 +4,57 @@
 {% endblock %}
 {% block content %}
     <div class='service_info_header'>
-        <h1>{{service.name}} -- {{service.price_hour}}€/hour</h1>
-        <h5>by <a href="/company/{{service.company.user}}">{{service.company.user}}</a></h5>
+        <h1>{{ service.name }} -- {{ service.price_hour }}€/hour</h1>
+        <h5>by <a href="/company/{{ service.company.user }}">{{ service.company.user }}</a></h5>
     </div>
-    <h3>{{service.field}}</h3>
-    <p style="text-align: left;">{{service.description}}</p>
+    <h3>{{ service.field }}</h3>
+    <p style="text-align: left;">{{ service.description }}</p>
     {% if request.user.is_customer %}
-        <a href="/services/{{service.id}}/request_service/" class="like_button">Request Service</a>
+        <a href="/services/{{ service.id }}/request_service/" class="like_button">Request Service</a>
+    {% endif %}
+
+    <!-- Display average rating -->
+    <div class="average_rating">
+        <h4>Average Rating: {{ service.average_rating }} / 5</h4>
+    </div>
+    <!-- Display reviews -->
+    <div class="reviews_section">
+        <h3>Customer Reviews:</h3>
+        {% if service.service_ratings.all %}
+            <ul>
+                {% for rating in service.service_ratings.all %}
+                    <li>
+                        <strong>{{ rating.customer.user.username }}:</strong>
+                        <span>{{ rating.rating_value }} / 5</span>
+                        <p>{{ rating.review }}</p>
+                        <small>Rated on: {{ rating.date_rated|date:"d M Y" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet. Be the first to rate this service!</p>
+        {% endif %}
+    </div>
+
+    <!-- Allow customer to leave a rating/review -->
+    {% if request.user.is_customer %}
+        <div class="rate_service">
+            <h3>Rate this Service:</h3>
+            <form method="POST" action="{% url 'submit_rating' service.id %}">
+                {% csrf_token %}
+                <label for="rating_value">Rating (1-5):</label>
+                <select name="rating_value" id="rating_value" required>
+                    <option value="">Select...</option>
+                    {% for i in rating_range %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="review">Review:</label>
+                <textarea name="review" id="review" rows="4" placeholder="Write an optional review..."></textarea>
+                <br>
+                <button type="submit" class="like_button">Submit Rating</button>
+            </form>
+        </div>
     {% endif %}
 {% endblock %}
